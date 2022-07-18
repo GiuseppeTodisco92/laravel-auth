@@ -12477,10 +12477,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _views_App_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./views/App.vue */ "./resources/js/views/App.vue");
 window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
 
-var App = new Vue({
+var app = new Vue({
   el: '#app',
   render: function render(h) {
-    return h(App);
+    return h(_views_App_vue__WEBPACK_IMPORTED_MODULE_0__["default"]);
   }
 });
 
