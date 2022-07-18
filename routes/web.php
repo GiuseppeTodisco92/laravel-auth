@@ -18,5 +18,14 @@ Route::get('/', function () {
 });
 
 Auth::routes();
+Route::middleware('auth')
+    ->namespace('Admin')
+    ->name('admin')
+    ->prefix('admin')
+    ->group(function(){
+        Route::get('/home', 'HomeController@index')->name('home');
+    });
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::any('{any?}', function(){
+    return view('guest.home');
+})->where('any', '.*');  //il where serve per matchare una rotta in questo caso gli stiamo dicendo che può fare match con qualsiasi cosa
