@@ -17,7 +17,8 @@ class PostController extends Controller
      */
     public function index()
     {
-        //
+        $posts = Post::all();
+        return view('admin.posts.index',compact('posts'));
     }
 
     /**
@@ -49,15 +50,7 @@ class PostController extends Controller
         $newPost = new Post();
         $newPost->fill($data);
 
-        $slug = Str::of($data['title'])->slug('-');
-        $count = 1;
-
-        while( Post::where('slug', $slug)->first() ){
-            $slug = Str::of($data['title'])->slug('-') . "-{$count}";
-            $count++;
-        }
-
-        $newPost->slug = $slug;
+        $newPost->slug = $this->getSlug($data['title']);
 
         $newPost->published = isset($data['published']); // restituisce true o false
         $newPost->save();
@@ -71,9 +64,9 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Post $post)
     {
-        //
+        return view('admin.posts.show', compact('post'));
     }
 
     /**
@@ -82,9 +75,9 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Post $post)
     {
-        //
+        return view('admin.posts.edit', compact('post'));
     }
 
     /**
@@ -94,9 +87,28 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Post $post)
     {
-        //
+        //validazione
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'required|string|max:65535',
+            'published' => 'sometimes|accepted'
+        ]);
+        // aggiornamento
+        $data = $request->all();
+
+        //se cambia il titolo aggiorno un altro slug
+        if($post->title != $data['title']){
+            $post->slug = $this->getSlug($data['title']);
+        }
+        $post->fill($data);
+
+        $post->published = isset($data['published']); // restituisce true o false
+        
+        $post->save();
+        // redirect 
+        return redirect()->route('admin.posts.show', $post->id);
     }
 
     /**
@@ -105,9 +117,10 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Post $post)
     {
-        //
+        $post->delete();
+        return redirect()->route('admin.posts.index');
     }
 
     private function getSlug($title)
